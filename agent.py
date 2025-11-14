@@ -1,10 +1,11 @@
 from google import genai
 from google.genai import types
 
-from tools.create_event_tool import *
+import datetime
+from tools.create_event_tool import create_event, create_event_function
 
 
-PROMPT = f"""You are a calendar assistant. You can help users create calendar events and answer questions. In order to find out the event, ask one question at a time to the user, they will respond and then you can ask the next question.
+PROMPT = f"""You are a calendar assistant. You can help users with their calendar. In order to find out the event, ask one question at a time to the user, they will respond and then you can ask the next question.
 You should gain the following necessary info:
 Event name:
 Start time and date:
@@ -14,6 +15,8 @@ Additionally you should ask if they want to include a description or a location.
 The current date is {str(datetime.datetime.today()).split()[0]}
 
 When giving the details as instructed by the tool, make sure to correctly capitalise the event name.
+
+On the first respose you give, briefly explain your role and what you can do.
 Current conversation:"""
 
 class CalendarAgent:

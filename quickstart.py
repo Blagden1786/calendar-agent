@@ -8,63 +8,54 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 # If modifying these scopes, delete the file token.json.
-SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
+SCOPES = ['https://www.googleapis.com/auth/calendar']  # Changed scope
 
 
 def main():
-  """Shows basic usage of the Google Calendar API.
-  Prints the start and name of the next 10 events on the user's calendar.
-  """
-  creds = None
-  # The file token.json stores the user's access and refresh tokens, and is
-  # created automatically when the authorization flow completes for the first
-  # time.
-  if os.path.exists("token.json"):
-    creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-  # If there are no (valid) credentials available, let the user log in.
-  if not creds or not creds.valid:
-    if creds and creds.expired and creds.refresh_token:
-      creds.refresh(Request())
-    else:
-      flow = InstalledAppFlow.from_client_secrets_file(
-          "credentials.json", SCOPES
-      )
-      creds = flow.run_local_server(port=0)
-    # Save the credentials for the next run
-    with open("token.json", "w") as token:
-      token.write(creds.to_json())
+    creds = None
+    if os.path.exists('token.json'):
+        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        with open('token.json', 'w') as token:
+            token.write(creds.to_json())
 
-  try:
-    service = build("calendar", "v3", credentials=creds)
+    try:
+        service = build('calendar', 'v3', credentials=creds)
 
-    # Call the Calendar API
-    now = datetime.datetime.now(tz=datetime.timezone.utc).isoformat()
-    print("Getting the upcoming 10 events")
-    events_result = (
-        service.events()
-        .list(
-            calendarId="primary",
-            timeMin=now,
-            maxResults=10,
-            singleEvents=True,
-            orderBy="startTime",
-        )
-        .execute()
-    )
-    events = events_result.get("items", [])
+        # Create an event
+        event = {
+            'summary': 'Python API Event',
+            'location': 'Some Location',
+            'description': 'A test event created with the Google Calendar API',
+            'start': {
+                'dateTime': '2024-07-15T09:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'end': {
+                'dateTime': '2024-07-15T10:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'reminders': {
+                'useDefault': False,
+                'overrides': [
+                    {'method': 'email', 'minutes': 24 * 60},
+                    {'method': 'popup', 'minutes': 10},
+                ],
+            },
+        }
 
-    if not events:
-      print("No upcoming events found.")
-      return
+        event = service.events().insert(calendarId='primary', body=event).execute()
+        print(f"Event created: {event.get('htmlLink')}")
 
-    # Prints the start and name of the next 10 events
-    for event in events:
-      start = event["start"].get("dateTime", event["start"].get("date"))
-      print(start, event["summary"])
-
-  except HttpError as error:
-    print(f"An error occurred: {error}")
+    except HttpError as error:
+        print('An error occurred: %s' % error)
 
 
-if __name__ == "__main__":
-  main()
+if __name__ == '__main__':
+    main()

@@ -3,7 +3,7 @@ from agent import CalendarAgent
 if __name__ == "__main__":
     agent = CalendarAgent()
 
-    prompt = "Help me put a calendar event in my diary."
+    prompt = ""
 
     while True:
         result = agent.run_agent(prompt)

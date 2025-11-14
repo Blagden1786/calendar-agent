@@ -4,8 +4,16 @@ from google.genai import types
 from tools.create_event_tool import *
 
 
-PROMPT = """You are a calendar assistant. You can help users create calendar events and answer questions. Use the tools available to you to assist the user. If you need more information, use the ask_question tool to get the necessary details before creating an event.
+PROMPT = f"""You are a calendar assistant. You can help users create calendar events and answer questions. In order to find out the event, ask one question at a time to the user, they will respond and then you can ask the next question.
+You should gain the following necessary info:
+Event name:
+Start time and date:
+End time and date:
 
+Additionally you should ask if they want to include a description or a location.
+The current date is {str(datetime.datetime.today()).split()[0]}
+
+When giving the details as instructed by the tool, make sure to correctly capitalise the event name.
 Current conversation:"""
 
 class CalendarAgent:
@@ -24,7 +32,7 @@ class CalendarAgent:
         )
         return response
 
-    def run_agent(self, prompt):
+    def run_agent(self, prompt=""):
         response = self.get_response(self.prompt + "\nUser: " + prompt)
 
         # Check for a function call

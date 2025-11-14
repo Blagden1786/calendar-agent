@@ -73,11 +73,11 @@ create_event_function = {
             },
             "start_datetime": {
                 "type": "string",
-                "description": "The start date and time of the event in ISO format (e.g., '2024-07-29T15:00:00').",
+                "description": "The start date and time of the event in ISO format (e.g., '2024-07-29T15:00:00'). When no time given just use the date part (eg '2025-12-25)",
             },
             "end_datetime": {
                 "type": "string",
-                "description": "The end date and time of the event in ISO format (e.g., '2024-07-29T16:00:00').",
+                "description": "The end date and time of the event in ISO format (e.g., '2024-07-29T16:00:00'). When no time given just use the date part (eg '2025-12-25)",
             },
         },
         "required": ["summary", "start_datetime", "end_datetime"],

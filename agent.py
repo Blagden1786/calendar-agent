@@ -3,15 +3,21 @@ from google.genai import types
 
 import datetime
 from tools.create_event_tool import create_event, create_event_function
+from tools.list_events_tool import list_events, list_events_function
 
 
-PROMPT = f"""You are a calendar assistant. You can help users with their calendar. In order to find out the event, ask one question at a time to the user, they will respond and then you can ask the next question.
+PROMPT = f"""You are a calendar assistant. You can help users with their calendar. You currently have the following abilities:
+1. You can create events in their calendar by asking them the necessary information:
+In order to find out the event, ask one question at a time to the user, they will respond and then you can ask the next question.
 You should gain the following necessary info:
 Event name:
 Start time and date:
 End time and date:
 
 Additionally you should ask if they want to include a description or a location.
+
+2. You can answer questions about their calendar by listing events within a specified time range.
+
 The current date is {str(datetime.datetime.today()).split()[0]}
 
 When giving the details as instructed by the tool, make sure to correctly capitalise the event name.
@@ -22,7 +28,7 @@ Current conversation:"""
 class CalendarAgent:
     def __init__(self, model="gemini-2.5-flash"):
         self.agent = genai.Client()
-        self.tools = types.Tool(function_declarations=[create_event_function])
+        self.tools = types.Tool(function_declarations=[create_event_function, list_events_function])
         self.config = types.GenerateContentConfig(tools=[self.tools])
 
         self.prompt = PROMPT
@@ -36,20 +42,34 @@ class CalendarAgent:
         return response
 
     def run_agent(self, prompt=""):
-        response = self.get_response(self.prompt + "\nUser: " + prompt)
+        while True:
+            # Append user prompt to conversation
+            if prompt:
+                self.prompt += f"\nUser: {prompt}\n"
 
-        # Check for a function call
-        if response.candidates[0].content.parts[0].function_call:
-            function_call = response.candidates[0].content.parts[0].function_call
-            print(f"Function to call: {function_call.name}")
-            print(f"Arguments: {function_call.args}")
+            # Get response from the agent
+            response = self.get_response(self.prompt)
 
-            # When more tools are added, use a switch statment or a mapping to
-            # Call the corresponding function
-            result = globals()[function_call.name](**function_call.args)
-            return result
-        else:
-            print("No function call found in the response.")
+            # Check for a function call - if there is, need to call the corresponding function
+            if response.candidates[0].content.parts[0].function_call:
+                function_call = response.candidates[0].content.parts[0].function_call
+                print(f"Function to call: {function_call.name}")
+                print(f"Arguments: {function_call.args}")
 
-            self.prompt += f"\nUser: {prompt}\nAssistant: {response.text}"
-            return response.text
+                # When more tools are added, use a switch statment or a mapping to
+                # Call the corresponding function
+                result = globals()[function_call.name](**function_call.args)
+                #print(f"Function result: {result}")
+
+                # Append the function call and result to the conversation
+                self.prompt += f"Assistant: {response}\nFunction {function_call.name} called with arguments {function_call.args} and returned {result}\n"
+
+                # Some tool calls may finish the task - in this case return the result
+                if function_call.name == "create_event":
+                    return result
+
+            else:
+                #print("No function call found in the response.")
+
+                self.prompt += f"\nUser: {prompt}\nAssistant: {response.text}"
+                return response.text

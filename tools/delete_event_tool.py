@@ -29,15 +29,12 @@ def delete_event(event_id):
     try:
         service = build('calendar', 'v3', credentials=creds)
 
-        # List next events
-        now = datetime.datetime.now(tz=datetime.timezone.utc).isoformat()
-
         events = service.events().delete(
             calendarId="primary",
             eventId=event_id,
         ).execute()
 
-        return events
+        return "Event deleted successfully."
 
     except HttpError as error:
         print('An error occurred: %s' % error)

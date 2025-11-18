@@ -72,7 +72,7 @@ class CalendarAgent:
                 self.prompt += f"Assistant: {response}\nFunction {function_call.name} called with arguments {function_call.args} and returned {result}\n"
 
                 # Some tool calls may finish the task - in this case return the result
-                if function_call.name == "create_event":
+                if function_call.name != "list_events":
                     return result
 
             else:

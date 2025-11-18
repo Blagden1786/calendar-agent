@@ -8,10 +8,10 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 import datetime
-#from path import PATH
+from .api_stuff.path import PATH
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/calendar']  # Changed scope
-PATH = 'C:/Users/George/Documents/GitHub/calendar-agent/'
+
 def delete_event(event_id):
     creds = None
     if os.path.exists(PATH + 'token.json'):

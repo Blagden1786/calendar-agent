@@ -5,7 +5,8 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from path import PATH
+
+from .api_stuff.path import PATH
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/calendar']  # Changed scope
 
@@ -46,7 +47,7 @@ def create_event(summary,  start_datetime, end_datetime, location="", descriptio
         }
 
         event = service.events().insert(calendarId='primary', body=event).execute()
-        return f"Event created: {event.get('htmlLink')}"
+        return f"Event created successfully"
 
     except HttpError as error:
         print('An error occurred: %s' % error)

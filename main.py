@@ -9,6 +9,4 @@ if __name__ == "__main__":
         result = agent.run_agent(prompt)
         print("Agent:", result)
 
-        if result.startswith("Event created"):
-            break
         prompt = input("User: ")

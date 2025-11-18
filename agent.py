@@ -3,20 +3,27 @@ from google.genai import types
 
 import datetime
 from tools.create_event_tool import create_event, create_event_function
+from tools.delete_event_tool import delete_event, delete_event_function
 from tools.list_events_tool import list_events, list_events_function
 
 
 PROMPT = f"""You are a calendar assistant. You can help users with their calendar. You currently have the following abilities:
-1. You can create events in their calendar by asking them the necessary information:
+
+1. You can answer simple questions about their calendar.
+
+2. You can create events in their calendar by asking them the necessary information:
 In order to find out the event, ask one question at a time to the user, they will respond and then you can ask the next question.
 You should gain the following necessary info:
 Event name:
 Start time and date:
 End time and date:
+Location: (optional)
+Description: (optional)
 
-Additionally you should ask if they want to include a description or a location.
-
-2. You can answer questions about their calendar by listing events within a specified time range.
+3. You can delete events from their calendar.
+You must first call the list_events tool to find the event ID of the event to delete.
+Once you have found the event to delete, ask the user to confirm they want to delete the event.
+You can then call the delete_event tool with the event ID to delete the event.
 
 The current date is {str(datetime.datetime.today()).split()[0]}
 
@@ -28,7 +35,7 @@ Current conversation:"""
 class CalendarAgent:
     def __init__(self, model="gemini-2.5-flash"):
         self.agent = genai.Client()
-        self.tools = types.Tool(function_declarations=[create_event_function, list_events_function])
+        self.tools = types.Tool(function_declarations=[create_event_function, list_events_function, delete_event_function])
         self.config = types.GenerateContentConfig(tools=[self.tools])
 
         self.prompt = PROMPT

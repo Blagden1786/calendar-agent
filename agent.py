@@ -1,9 +1,7 @@
 import json
-from google import genai
-from google.genai import types
 from openai import OpenAI
 
-import datetime
+from datetime import datetime
 from tools.create_event_tool import create_event, create_event_function
 from tools.delete_event_tool import delete_event, delete_event_function
 from tools.edit_event_tool import edit_event, edit_event_function
@@ -34,7 +32,7 @@ Once you have found the event, ask the user to confirm this is the correct one.
 Call the edit_event tool with the eventID and new details.
 
 
-The current date is {str(datetime.datetime.today()).split()[0]}
+The current date is {str(datetime.today()).split()[0]}
 
 When giving the details as instructed by the tool, make sure to correctly capitalise the event name.
 

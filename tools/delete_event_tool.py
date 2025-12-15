@@ -1,4 +1,3 @@
-from math import e
 import os.path
 
 from google.auth.transport.requests import Request
@@ -7,7 +6,6 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-import datetime
 from .api_stuff.path import PATH
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/calendar']  # Changed scope

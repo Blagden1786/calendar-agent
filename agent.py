@@ -6,6 +6,7 @@ from openai import OpenAI
 import datetime
 from tools.create_event_tool import create_event, create_event_function
 from tools.delete_event_tool import delete_event, delete_event_function
+from tools.edit_event_tool import edit_event, edit_event_function
 from tools.list_events_tool import list_events, list_events_function
 
 
@@ -38,7 +39,7 @@ class CalendarAgent:
     def __init__(self, model="gpt-5-nano"):
         self.agent = OpenAI()
         self.model = model
-        self.tools = [create_event_function, list_events_function, delete_event_function]
+        self.tools = [create_event_function, list_events_function, delete_event_function, edit_event_function]
 
         self.prompt = PROMPT
         self.inputs = []

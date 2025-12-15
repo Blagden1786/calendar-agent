@@ -1,7 +1,7 @@
 from agent import CalendarAgent
 
 if __name__ == "__main__":
-    agent = CalendarAgent()
+    agent = CalendarAgent("gpt-5-nano")
 
     prompt = ""
 

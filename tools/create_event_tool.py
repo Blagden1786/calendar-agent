@@ -54,6 +54,7 @@ def create_event(summary,  start_datetime, end_datetime, location="", descriptio
 
 # Define the function declaration for the tool
 create_event_function = {
+    "type": "function",
     "name": "create_event",
     "description": "Creates a calendar event with the specified details.",
     "parameters": {

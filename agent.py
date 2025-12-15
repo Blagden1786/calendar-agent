@@ -1,5 +1,7 @@
+import json
 from google import genai
 from google.genai import types
+from openai import OpenAI
 
 import datetime
 from tools.create_event_tool import create_event, create_event_function
@@ -30,53 +32,54 @@ The current date is {str(datetime.datetime.today()).split()[0]}
 When giving the details as instructed by the tool, make sure to correctly capitalise the event name.
 
 On the first respose you give, briefly explain your role and what you can do.
-Current conversation:"""
+Once you have used the necessary tools, call no tools and return a text response."""
 
 class CalendarAgent:
-    def __init__(self, model="gemini-2.5-flash"):
-        self.agent = genai.Client()
-        self.tools = types.Tool(function_declarations=[create_event_function, list_events_function, delete_event_function])
-        self.config = types.GenerateContentConfig(tools=[self.tools])
+    def __init__(self, model="gpt-5-nano"):
+        self.agent = OpenAI()
+        self.model = model
+        self.tools = [create_event_function, list_events_function, delete_event_function]
 
         self.prompt = PROMPT
+        self.inputs = []
 
-    def get_response(self, prompt):
-        response = self.agent.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt,
-            config=self.config,
-        )
+    def get_response(self):
+        response = self.agent.responses.create(model=self.model, tools=self.tools, input=self.inputs, instructions=self.prompt)
         return response
 
     def run_agent(self, prompt=""):
+
         while True:
-            # Append user prompt to conversation
-            if prompt:
-                self.prompt += f"\nUser: {prompt}\n"
+            tool_used = False
+            # Append user prompt to input list
+            self.inputs += [{'role': 'user', 'content': prompt}]
 
             # Get response from the agent
-            response = self.get_response(self.prompt)
+            response = self.get_response()
 
-            # Check for a function call - if there is, need to call the corresponding function
-            if response.candidates[0].content.parts[0].function_call:
-                function_call = response.candidates[0].content.parts[0].function_call
-                print(f"Function to call: {function_call.name}")
-                print(f"Arguments: {function_call.args}")
+            # Add output of agent to inputs
+            self.inputs += response.output
 
-                # When more tools are added, use a switch statment or a mapping to
-                # Call the corresponding function
-                result = globals()[function_call.name](**function_call.args)
-                #print(f"Function result: {result}")
+            for item in response.output:
+                # Check for a function call - if there is, need to call the corresponding function
+                if item.type == 'function_call':
+                    tool_used = True
+                    print(f"Function to call: {item.name}")
+                    print(f"Arguments: {item.arguments}")
 
-                # Append the function call and result to the conversation
-                self.prompt += f"Assistant: {response}\nFunction {function_call.name} called with arguments {function_call.args} and returned {result}\n"
+                    # When more tools are added, use a switch statment or a mapping to
+                    # Call the corresponding function
+                    result = globals()[item.name](**json.loads(item.arguments))
+                    #print(f"Function result: {result}")
 
-                # Some tool calls may finish the task - in this case return the result
-                if function_call.name != "list_events":
-                    return result
+                    # Append the function call and result to the conversation
+                    self.inputs.append({
+                        "type": "function_call_output",
+                        "call_id": item.call_id,
+                        "output": json.dumps({
+                        f"{item.name}": result
+                        })
+                    })
 
-            else:
-                #print("No function call found in the response.")
-
-                self.prompt += f"\nUser: {prompt}\nAssistant: {response.text}"
-                return response.text
+            if not tool_used:
+                return response.output_text

@@ -41,6 +41,7 @@ def delete_event(event_id):
 
 # Define the function declaration for the tool
 delete_event_function = {
+    "type": "function",
     "name": "delete_event",
     "description": "Deletes a calendar event with the specified event ID.",
     "parameters": {

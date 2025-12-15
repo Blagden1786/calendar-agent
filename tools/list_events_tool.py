@@ -47,6 +47,7 @@ def list_events(time_from, time_to):
 
 # Define the function declaration for the tool
 list_events_function = {
+    "type": "function",
     "name": "list_events",
     "description": "Lists calendar events within the specified time range.",
     "parameters": {

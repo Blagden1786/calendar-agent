@@ -8,6 +8,9 @@ The user can have a conversation about their calendar with CalA. It can go and f
 <h3>Create Events</h3>
 The user can ask CalA to create and event in the calendar. It can include a description and/or a location.
 
+<h3>Edit Events</h3>
+The user can ask CalA to edit an event in their calendar. It will go and find the event, confirm its the right one and then make the requested changes.
+
 <h3>Delete Events</h3>
 The user can ask CalA to delete an event by describing it. CalA will find the event, confirm it has found the correct one with the user and then delete it.
 

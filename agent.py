@@ -53,6 +53,9 @@ class CalendarAgent:
         return response
 
     def run_agent(self, prompt=""):
+        # Defined message for first time
+        if prompt == "":
+            return "Hello, I am your calendar assistant. I can make, edit, delete and help you undestand your calendar. Just let me know what you want to do!"
 
         while True:
             tool_used = False
@@ -72,7 +75,6 @@ class CalendarAgent:
                     print(f"Function to call: {item.name}")
                     print(f"Arguments: {item.arguments}")
 
-                    # When more tools are added, use a switch statment or a mapping to
                     # Call the corresponding function
                     result = globals()[item.name](**json.loads(item.arguments))
                     #print(f"Function result: {result}")

@@ -11,7 +11,7 @@ from .api_stuff.path import PATH
 SCOPES = ['https://www.googleapis.com/auth/calendar']  # Changed scope
 
 
-def create_event(summary,  start_datetime, end_datetime, location="", description=""):
+def create_event(summary,  start_datetime, end_datetime, location="", description="", colour=''):
     creds = None
     if os.path.exists(PATH + 'token.json'):
         creds = Credentials.from_authorized_user_file(PATH + 'token.json', SCOPES)
@@ -33,6 +33,7 @@ def create_event(summary,  start_datetime, end_datetime, location="", descriptio
             'summary': summary,
             'location': location,
             'description': description,
+            'colorId' : colour,
             'start': {
                 'dateTime': start_datetime,
                 'timeZone': 'Europe/London',
@@ -80,6 +81,10 @@ create_event_function = {
                 "type": "string",
                 "description": "The end date and time of the event in ISO format (e.g., '2024-07-29T16:00:00Z')",
             },
+            'colour' : {
+                'type': 'string',
+                'description': 'The colour of the event. To assign a colour follow this logic: If it is sport related give it "8", if it is work related give it "3". Otherwise, pass no argument'
+            }
         },
         "required": ["summary", "start_datetime", "end_datetime"],
     },

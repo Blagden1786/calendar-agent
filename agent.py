@@ -36,7 +36,6 @@ The current date is {str(datetime.today()).split()[0]}
 
 When giving the details as instructed by the tool, make sure to correctly capitalise the event name.
 
-On the first respose you give, briefly explain your role and what you can do. Do not give any details about your process, just the four things you can do.
 Once you have used the necessary tools, call no tools and return a text response."""
 
 class CalendarAgent:

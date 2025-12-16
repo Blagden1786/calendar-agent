@@ -39,7 +39,7 @@ def list_events(time_from, time_to):
             singleEvents=True,
             orderBy="startTime",
         ).execute()
-
+        print(events)
         return events
 
     except HttpError as error:
@@ -55,11 +55,11 @@ list_events_function = {
         "properties": {
             "time_from": {
                 "type": "string",
-                "description": "The start date and time of the event in ISO format (e.g., '2024-07-29T15:00:00Z').",
+                "description": "The start date and time of the event in ISO format: yyyy-mm-ddThh:mm:ssZ (e.g., '2024-07-29T15:00:00Z').",
             },
             "time_to": {
                 "type": "string",
-                "description": "The end date and time of the event in ISO format (e.g., '2024-07-29T16:00:00Z').",
+                "description": "The end date and time of the event in ISO format yyyy-mm-ddThh:mm:ssZ (e.g., '2024-07-29T16:00:00Z').",
             },
         },
         "required": ["time_from", "time_to"],

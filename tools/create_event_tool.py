@@ -89,3 +89,82 @@ create_event_function = {
         "required": ["summary", "start_datetime", "end_datetime"],
     },
 }
+
+def create_allday_event(summary,  start_date, end_date, location="", description="", colour=''):
+    creds = None
+    if os.path.exists(PATH + 'token.json'):
+        creds = Credentials.from_authorized_user_file(PATH + 'token.json', SCOPES)
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                PATH + 'credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        with open(PATH + 'token.json', 'w') as token:
+            token.write(creds.to_json())
+
+    try:
+        service = build('calendar', 'v3', credentials=creds)
+
+        # Create an event
+        event = {
+            'summary': summary,
+            'location': location,
+            'description': description,
+            'colorId' : colour,
+            'start': {
+                'date': start_date,
+                'timeZone': 'Europe/London',
+            },
+            'end': {
+                'date': end_date,
+                'timeZone': 'Europe/London',
+            },
+            'reminders': {
+                'useDefault': False,
+            },
+        }
+
+        event = service.events().insert(calendarId='primary', body=event).execute()
+        return f"Event created successfully"
+
+    except HttpError as error:
+        print('An error occurred: %s' % error)
+
+# Define the function declaration for the tool
+create_allday_event_function = {
+    "type": "function",
+    "name": "create_event",
+    "description": "Creates a calendar event with the specified details.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "summary": {
+                "type": "string",
+                "description": "The summary or title of the event.",
+            },
+            "location": {
+                "type": "string",
+                "description": "The location of the event.",
+            },
+            "description": {
+                "type": "string",
+                "description": "A description of the event.",
+            },
+            "start_datetime": {
+                "type": "string",
+                "description": "The start date and time of the event in the format yyyy-mm-dd (e.g., '2024-07-29')",
+            },
+            "end_datetime": {
+                "type": "string",
+                "description": "The end date and time of the event in the format yyyy-mm-dd (e.g., '2024-07-29')",
+            },
+            'colour' : {
+                'type': 'string',
+                'description': 'The colour of the event. To assign a colour follow this logic: If it is sport related give it "8", if it is work related give it "3". Otherwise, pass no argument'
+            }
+        },
+        "required": ["summary", "start_datetime", "end_datetime"],
+    },
+}
